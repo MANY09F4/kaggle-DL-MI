@@ -5,9 +5,7 @@
 data/
 *.h5
 *.csv
-<<<<<<< Updated upstream
 CailleTest.ipynb
-=======
 
 # Fichiers de notebooks temporaires
 .ipynb_checkpoints/
@@ -31,4 +29,3 @@ checkpoints/
 # Fichiers logs / outputs
 *.log
 *.out
->>>>>>> Stashed changes
