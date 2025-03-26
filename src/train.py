@@ -50,7 +50,7 @@ def main(args):
 
     # ==== Modèle ====
     if args.model == 'base':
-        from src.models import linear_probing
+        from models import linear_probing
         model = linear_probing(feature_extractor=feature_extractor).to(device)
     else:
         raise ValueError(f"Unknown model: {args.model}")
