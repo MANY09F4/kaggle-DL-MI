@@ -44,7 +44,7 @@ def main(args):
     # ==== Données ====
     if args.preprocess_type == "base":
         from preprocess import preprocess_base
-        feature_extractor = torch.hub.load('facebookresearch/dinov2', 'dinov2_vits14')
+        feature_extractor = torch.hub.load('facebookresearch/dinov2', 'dinov2_vits14').to(device)
         feature_extractor.eval()
         train_loader, val_loader = preprocess_base(type="train",feature_extractor=feature_extractor,device=device,args=args) 
 
