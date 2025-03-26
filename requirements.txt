@@ -1,0 +1,7 @@
+torch
+torchvision
+torchmetrics
+h5py
+tqdm
+pandas
+numpy
