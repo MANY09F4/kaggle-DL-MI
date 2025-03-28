@@ -254,6 +254,7 @@ class MultiStainCycleGANModel(BaseModel):
 
 
             self.forward()      # compute fake images and reconstruction images.
+
             # G_A and G_B
         self.set_requires_grad([self.netD_A, self.netD_B], False)  # Ds require no gradients when optimizing Gs
         self.optimizer_G.zero_grad()  # set G_A and G_B's gradients to zero
