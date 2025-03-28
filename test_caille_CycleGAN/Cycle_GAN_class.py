@@ -248,18 +248,18 @@ class MultiStainCycleGANModel(BaseModel):
     def optimize_parameters(self):
         """Calculate losses, gradients, and update network weights; called in every training iteration"""
         # forward
-        #with autocast():
+        with autocast():
         #with autocast(device_type=self.device.type):
-        with autocast(device_type='cuda'):
+        #with autocast(device_type='cuda'):
 
 
             self.forward()      # compute fake images and reconstruction images.
             # G_A and G_B
         self.set_requires_grad([self.netD_A, self.netD_B], False)  # Ds require no gradients when optimizing Gs
         self.optimizer_G.zero_grad()  # set G_A and G_B's gradients to zero
-        #with autocast():
+        with autocast():
         #with autocast(device_type=self.device.type):
-        with autocast(device_type='cuda'):
+        #with autocast(device_type='cuda'):
 
 
             loss_G = self.backward_G()             # calculate gradients for G_A and G_B
@@ -272,9 +272,9 @@ class MultiStainCycleGANModel(BaseModel):
         self.set_requires_grad([self.netD_A, self.netD_B], True)
         self.optimizer_D.zero_grad()   # set D_A and D_B's gradients to zero
 
-        #with autocast():
+        with autocast():
         #with autocast(device_type=self.device.type):
-        with autocast(device_type='cuda'):
+        #with autocast(device_type='cuda'):
 
 
             loss_D_A = self.backward_D_A()      # calculate gradients for D_A
