@@ -48,13 +48,9 @@ class H5UnalignedDataset(Dataset):
         index_A = idx % self.len_A
         index_B = idx % self.len_B
 
-        with h5py.File(self.h5_path_A, 'r') as fA:
+        with h5py.File(self.h5_path_A, 'r') as fA, h5py.File(self.h5_path_B, 'r') as fB:
             img_A = torch.tensor(fA[self.keys_A[index_A]]['img'][()])
-        with h5py.File(self.h5_path_B, 'r') as fB:
             img_B = torch.tensor(fB[self.keys_B[index_B]]['img'][()])
-
-        img_A = torch.tensor(fA[self.keys_A[index_A]]['img'][()])
-        img_B = torch.tensor(fB[self.keys_B[index_B]]['img'][()])
 
         # Assure-toi que les images sont bien au format [C, H, W]
         if img_A.ndim == 3 and img_A.shape[-1] == 3:
