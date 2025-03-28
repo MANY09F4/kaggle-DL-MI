@@ -1,6 +1,6 @@
 import os
 import time
-from options.train_options import TrainOptions
+from .options.train_options import TrainOptions
 from util.visualizer import Visualizer  # À créer plus tard si tu veux de l'affichage
 from .h5_dataset import H5UnalignedDataset, count_labels_and_centers
 from .Cycle_GAN_class import MultiStainCycleGANModel
