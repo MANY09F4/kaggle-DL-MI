@@ -28,17 +28,17 @@ def main():
         max_items_B=opt.max_items_B
     )
 
-    print("\n[DEBUG] Stats par centre et label :")
-    stats_A = count_labels_and_centers(opt.train_path, dataset.keys_A)
-    stats_B = count_labels_and_centers(opt.val_path, dataset.keys_B)
+    # print("\n[DEBUG] Stats par centre et label :")
+    # stats_A = count_labels_and_centers(opt.train_path, dataset.keys_A)
+    # stats_B = count_labels_and_centers(opt.val_path, dataset.keys_B)
 
-    print("Train (A):")
-    for center in sorted(stats_A.keys()):
-        print(f"  Centre {center} - label 0: {stats_A[center][0]}, label 1: {stats_A[center][1]}")
+    # print("Train (A):")
+    # for center in sorted(stats_A.keys()):
+    #     print(f"  Centre {center} - label 0: {stats_A[center][0]}, label 1: {stats_A[center][1]}")
 
-    print("Val   (B):")
-    for center in sorted(stats_B.keys()):
-        print(f"  Centre {center} - label 0: {stats_B[center][0]}, label 1: {stats_B[center][1]}")
+    # print("Val   (B):")
+    # for center in sorted(stats_B.keys()):
+    #     print(f"  Centre {center} - label 0: {stats_B[center][0]}, label 1: {stats_B[center][1]}")
 
     dataloader = DataLoader(dataset, batch_size=opt.batch_size, shuffle=True)
 

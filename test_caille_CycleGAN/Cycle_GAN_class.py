@@ -5,8 +5,11 @@ from test_caille_CycleGAN.base_model import BaseModel
 from test_caille_CycleGAN import networks
 from torchvision.transforms import Grayscale, ColorJitter
 #from torch.cuda.amp import GradScaler, autocast
-from torch.cuda.amp import GradScaler, autocast
-
+#from torch.cuda.amp import GradScaler, autocast
+try:
+    from torch.amp import autocast, GradScaler  # PyTorch >= 2.0
+except ImportError:
+    from torch.cuda.amp import autocast, GradScaler  # PyTorch < 2.0
 
 class MultiStainCycleGANModel(BaseModel):
     """
@@ -244,13 +247,17 @@ class MultiStainCycleGANModel(BaseModel):
         """Calculate losses, gradients, and update network weights; called in every training iteration"""
         # forward
         #with autocast():
-        with autocast(device_type=self.device.type):
+        #with autocast(device_type=self.device.type):
+        with autocast(device='cuda'):
+
             self.forward()      # compute fake images and reconstruction images.
             # G_A and G_B
         self.set_requires_grad([self.netD_A, self.netD_B], False)  # Ds require no gradients when optimizing Gs
         self.optimizer_G.zero_grad()  # set G_A and G_B's gradients to zero
         #with autocast():
-        with autocast(device_type=self.device.type):
+        #with autocast(device_type=self.device.type):
+        with autocast(device='cuda'):
+
             loss_G = self.backward_G()             # calculate gradients for G_A and G_B
         self.grad_scaler_G.scale(loss_G).backward()
         self.grad_scaler_G.step(self.optimizer_G)
@@ -262,7 +269,9 @@ class MultiStainCycleGANModel(BaseModel):
         self.optimizer_D.zero_grad()   # set D_A and D_B's gradients to zero
 
         #with autocast():
-        with autocast(device_type=self.device.type):
+        #with autocast(device_type=self.device.type):
+        with autocast(device='cuda'):
+
             loss_D_A = self.backward_D_A()      # calculate gradients for D_A
             loss_D_B = self.backward_D_B()      # calculate graidents for D_B
             loss_D = loss_D_A + loss_D_B
