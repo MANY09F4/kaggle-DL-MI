@@ -8,7 +8,7 @@ import pandas as pd
 from tqdm import tqdm
 import torchvision.transforms as transforms
 
-from src.models import linear_probing
+from models import linear_probing
 
 
 def load_model(model_type, checkpoint_path, feature_extractor, device):
@@ -33,7 +33,16 @@ def main(args):
     model = load_model(args.model, args.checkpoint, feature_extractor, device)
 
     # === Preprocessing (must match training) ===
-    preprocessing = transforms.Resize((98, 98))
+    if args.preprocessing == "base":
+        preprocessing = transforms.Resize((98, 98))
+    elif args.preprocessing == "grey":  
+        preprocessing = transforms.Compose([
+                        transforms.ToPILImage(),
+                        transforms.Grayscale(num_output_channels=3),  
+                        transforms.Resize((98, 98)),
+                        transforms.ToTensor()
+                    ])
+
 
     # === Predictions ===
     solutions_data = {'ID': [], 'Pred': []}
@@ -63,6 +72,7 @@ if __name__ == "__main__":
     parser.add_argument('--checkpoint', type=str, default='../checkpoints/models/best_model.pth', help='Path to model checkpoint')
     parser.add_argument('--test_path', type=str, default='../data/test.h5', help='Path to test H5 file')
     parser.add_argument('--output', type=str, default='../checkpoints/submit/submit.csv', help='Output CSV path for submission')
+    parser.add_argument("--preprocessing", type=str, default='base', help="type of preprocessing")
     args = parser.parse_args()
 
     main(args)

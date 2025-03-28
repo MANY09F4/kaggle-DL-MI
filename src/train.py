@@ -1,10 +1,11 @@
 #Import 
-from tqdm import tqdm
 import numpy as np
+from tqdm import tqdm
 import torch
 import argparse
 import torchmetrics
 from torch.utils.data import Dataset, DataLoader 
+import torchvision.transforms as transforms
 
 
 
@@ -41,12 +42,22 @@ def main(args):
     # Device
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+    if args.preprocessing == "base":
+        preprocessing = transforms.Resize((98, 98))
+    elif args.preprocessing == "grey":
+        preprocessing = transforms.Compose([
+                            transforms.ToPILImage(),
+                            transforms.Grayscale(num_output_channels=3),  
+                            transforms.Resize((98, 98)),
+                            transforms.ToTensor()
+                        ])
+
     # ==== Données ====
     if args.preprocess_type == "base":
         from preprocess import preprocess_base
         feature_extractor = torch.hub.load('facebookresearch/dinov2', 'dinov2_vits14').to(device)
         feature_extractor.eval()
-        train_loader, val_loader = preprocess_base(type="train",feature_extractor=feature_extractor,device=device,args=args) 
+        train_loader, val_loader = preprocess_base(type="train",feature_extractor=feature_extractor,preprocessing=preprocessing,device=device,args=args) 
 
     # ==== Modèle ====
     if args.model == 'base':
@@ -88,7 +99,7 @@ if __name__ == "__main__":
     parser.add_argument("--epochs", type=int, default=20)
     parser.add_argument("--batch_size", type=int, default=32)
     parser.add_argument("--lr", type=float, default=1e-3)
-    parser.add_argument("--patience", type=int, default=5)
+    parser.add_argument("--patience", type=int, default=8)
     parser.add_argument("--checkpoint_path", type=str, default='../checkpoints/models/best_model.pth')
     parser.add_argument("--optimizer", type=str, default="Adam", help="Optimizer type")
     parser.add_argument("--loss", type=str, default='BCELoss', help="Loss type")
@@ -96,6 +107,8 @@ if __name__ == "__main__":
     parser.add_argument("--preprocess_type", type=str, default='base', help="Preprocessing type")
     parser.add_argument("--train_path", type=str, default='../data/train.h5', help="Data Train Path")
     parser.add_argument("--val_path", type=str, default='../data/val.h5', help="Data Validation Path")
+    parser.add_argument("--preprocessing", type=str, default='base', help="type of preprocessing")
+    parser.add_argument("--size_train", type=int, default=0)
 
     args = parser.parse_args()
 
