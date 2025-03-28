@@ -17,3 +17,5 @@ class TrainOptions(BaseOptions):
         self.parser.add_argument('--lambda_identity', type=float, default=0.5, help='poids identity loss')
         self.parser.add_argument('--max_items_A', type=int, default=None, help='Nombre max d\'images dans train (domaine A)')
         self.parser.add_argument('--max_items_B', type=int, default=None, help='Nombre max d\'images dans val (domaine B)')
+        self.parser.add_argument('--train_path', type=str, default='data/train.h5', help='chemin vers train.h5')
+        self.parser.add_argument('--val_path', type=str, default='data/val.h5', help='chemin vers val.h5')

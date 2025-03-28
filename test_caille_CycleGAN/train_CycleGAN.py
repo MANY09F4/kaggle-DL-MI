@@ -20,17 +20,19 @@ def main():
     transform = None
 
     dataset = H5UnalignedDataset(
-    h5_path_A='data/train.h5',
-    h5_path_B='data/val.h5',
+    h5_path_A=opt.train_path,
+    h5_path_B=opt.val_path,
     transform=transform,
     max_items_A=opt.max_items_A,
     max_items_B=opt.max_items_B
 )
 
 
+
     print("\n[DEBUG] Stats par centre et label :")
-    stats_A = count_labels_and_centers('data/train.h5', dataset.keys_A)
-    stats_B = count_labels_and_centers('data/val.h5', dataset.keys_B)
+    stats_A = count_labels_and_centers(opt.train_path, dataset.keys_A)
+    stats_B = count_labels_and_centers(opt.val_path, dataset.keys_B)
+
 
     print("Train (A):")
     for center in sorted(stats_A.keys()):
