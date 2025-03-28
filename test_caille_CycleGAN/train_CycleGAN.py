@@ -77,7 +77,7 @@ def main():
                 #print(f"[Epoch {epoch} | Iter {epoch_iter}] Losses G: {losses[0]:.4f}, D_A: {losses[1]:.4f}, D_B: {losses[2]:.4f}")
                 print(f"[Epoch {epoch} | Iter {epoch_iter}] " + ", ".join([f"{k}: {v:.4f}" for k, v in losses.items()]))
 
-                visualizer.plot_current_losses(epoch, float(epoch_iter) / len(dataset), losses)
+                #visualizer.plot_current_losses(epoch, float(epoch_iter) / len(dataset), losses)
 
                 # Affichage avec visualizer
                 visuals = model.get_current_visuals()
