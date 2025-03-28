@@ -53,9 +53,19 @@ class H5UnalignedDataset(Dataset):
         with h5py.File(self.h5_path_B, 'r') as fB:
             img_B = torch.tensor(fB[self.keys_B[index_B]]['img'][()])
 
-        # Normalisation [0, 1]
-        img_A = img_A.float() / 255.0
-        img_B = img_B.float() / 255.0
+        img_A = torch.tensor(fA[self.keys_A[index_A]]['img'][()])
+        img_B = torch.tensor(fB[self.keys_B[index_B]]['img'][()])
+
+        # Assure-toi que les images sont bien au format [C, H, W]
+        if img_A.ndim == 3 and img_A.shape[-1] == 3:
+            img_A = img_A.permute(2, 0, 1)  # [H, W, C] → [C, H, W]
+        if img_B.ndim == 3 and img_B.shape[-1] == 3:
+            img_B = img_B.permute(2, 0, 1)
+
+        # Normalisation [-1, 1] (standard pour les GANs)
+        img_A = img_A.float() / 127.5 - 1.0
+        img_B = img_B.float() / 127.5 - 1.0
+
 
         if self.transform:
             img_A = self.transform(img_A)
