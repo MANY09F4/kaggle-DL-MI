@@ -6,10 +6,12 @@ from test_caille_CycleGAN import networks
 from torchvision.transforms import Grayscale, ColorJitter
 #from torch.cuda.amp import GradScaler, autocast
 #from torch.cuda.amp import GradScaler, autocast
-try:
-    from torch.amp import autocast, GradScaler  # PyTorch >= 2.0
-except ImportError:
-    from torch.cuda.amp import autocast, GradScaler  # PyTorch < 2.0
+if hasattr(torch.cuda.amp, 'autocast'):
+    autocast = torch.cuda.amp.autocast
+    GradScaler = torch.cuda.amp.GradScaler
+else:
+    autocast = torch.amp.autocast
+    GradScaler = torch.amp.GradScaler
 
 class MultiStainCycleGANModel(BaseModel):
     """
