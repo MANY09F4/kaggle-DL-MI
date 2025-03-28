@@ -2,8 +2,8 @@ import os
 import time
 from options.train_options import TrainOptions
 from util.visualizer import Visualizer  # À créer plus tard si tu veux de l'affichage
-from test_caille_CycleGAN.h5_dataset import H5UnalignedDataset, count_labels_and_centers
-from test_caille_CycleGAN.Cycle_GAN_class import MultiStainCycleGANModel
+from .h5_dataset import H5UnalignedDataset, count_labels_and_centers
+from .Cycle_GAN_class import MultiStainCycleGANModel
 from torch.utils.data import DataLoader
 from torchvision import transforms
 from torchvision.transforms import Compose, Resize
