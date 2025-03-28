@@ -1,8 +1,8 @@
 import torch
 import itertools
-from util.image_pool import ImagePool
-from base_model import BaseModel
-from . import networks
+from test_caille_CycleGAN.util.image_pool import ImagePool
+from test_caille_CycleGAN.base_model import BaseModel
+from test_caille_CycleGAN import networks
 from torchvision.transforms import Grayscale, ColorJitter
 #from torch.cuda.amp import GradScaler, autocast
 from torch.amp import GradScaler, autocast

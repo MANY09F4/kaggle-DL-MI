@@ -1,9 +1,9 @@
 import os
 import time
-from .options.train_options import TrainOptions
-#from util.visualizer import Visualizer  # À créer plus tard si tu veux de l'affichage
-from .h5_dataset import H5UnalignedDataset, count_labels_and_centers
-from .Cycle_GAN_class import MultiStainCycleGANModel
+from test_caille_CycleGAN.options.train_options import TrainOptions
+from test_caille_CycleGAN.util.visualizer import Visualizer  # À créer plus tard si tu veux de l'affichage
+from test_caille_CycleGAN.h5_dataset import H5UnalignedDataset, count_labels_and_centers
+from test_caille_CycleGAN.Cycle_GAN_class import MultiStainCycleGANModel
 from torch.utils.data import DataLoader
 from torchvision import transforms
 from torchvision.transforms import Compose, Resize
@@ -20,19 +20,16 @@ def main():
     transform = None
 
     dataset = H5UnalignedDataset(
-    h5_path_A=opt.train_path,
-    h5_path_B=opt.val_path,
-    transform=transform,
-    max_items_A=opt.max_items_A,
-    max_items_B=opt.max_items_B
-)
-
-
+        h5_path_A=opt.train_path,
+        h5_path_B=opt.val_path,
+        transform=transform,
+        max_items_A=opt.max_items_A,
+        max_items_B=opt.max_items_B
+    )
 
     print("\n[DEBUG] Stats par centre et label :")
     stats_A = count_labels_and_centers(opt.train_path, dataset.keys_A)
     stats_B = count_labels_and_centers(opt.val_path, dataset.keys_B)
-
 
     print("Train (A):")
     for center in sorted(stats_A.keys()):
@@ -41,7 +38,6 @@ def main():
     print("Val   (B):")
     for center in sorted(stats_B.keys()):
         print(f"  Centre {center} - label 0: {stats_B[center][0]}, label 1: {stats_B[center][1]}")
-
 
     dataloader = DataLoader(dataset, batch_size=opt.batch_size, shuffle=True)
 
@@ -58,7 +54,6 @@ def main():
         epoch_iter = 0
         print(f"\n🔁 Début époque {epoch}")
 
-        #model.train()
         model.isTrain = True
         for i, data in enumerate(dataloader):
             total_iters += opt.batch_size
