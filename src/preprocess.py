@@ -3,6 +3,7 @@ import numpy as np
 import h5py
 import torch
 from tqdm import tqdm
+import torchstain
 
 
 class BaselineDataset(Dataset):
@@ -76,7 +77,7 @@ class PrecomputedDataset(Dataset):
 def preprocess_base(type,feature_extractor,device,preprocessing,args):
     if type == "train":
         if args.size_train > 0:
-            max_samples_train =   args.size_train
+            max_samples_train = args.size_train
             max_samples_val = int(args.size_train*0.3)
         else:
             max_samples_train =   None
@@ -96,3 +97,12 @@ def preprocess_base(type,feature_extractor,device,preprocessing,args):
         return train_loader, val_loader
     else:
         return 0 
+
+
+def apply_macenko(dataset,test_path,preprocessing_test,idx_test):
+
+    normalizer = torchstain.normalizers.MacenkoNormalizer(backend='torch')
+    test_dataset = BaselineDataset(test_path, preprocessing_test, 'train')
+    target_img = test_dataset[idx_test][0]
+    normalizer.fit(target_img)
+
