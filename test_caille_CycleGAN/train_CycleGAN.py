@@ -10,6 +10,7 @@ from torchvision.transforms import Compose, Resize
 
 def main():
     opt = TrainOptions().parse()  # Récupère les options (ex: batch_size, lr, etc.)
+
     print(f"[INFO] Options : {opt}")
 
     # Dataset : train = domaine A, val = domaine B
@@ -47,12 +48,19 @@ def main():
     model = MultiStainCycleGANModel(opt)
     model.setup(opt)
 
+    visualizer = Visualizer(opt)
+
     total_iters = 0
 
     for epoch in range(opt.epoch_count, opt.n_epochs + opt.n_epochs_decay + 1):
+
+        model.update_learning_rate()
+
         epoch_start_time = time.time()
         epoch_iter = 0
         print(f"\n🔁 Début époque {epoch}")
+        visualizer.reset()
+
 
         model.isTrain = True
         for i, data in enumerate(dataloader):
@@ -63,15 +71,24 @@ def main():
             model.optimize_parameters()
 
             if total_iters % opt.print_freq == 0:
-                losses = model.loss_G, model.loss_D_A, model.loss_D_B
-                print(f"[Epoch {epoch} | Iter {epoch_iter}] Losses G: {losses[0]:.4f}, D_A: {losses[1]:.4f}, D_B: {losses[2]:.4f}")
+                #losses = model.loss_G, model.loss_D_A, model.loss_D_B
+                losses = model.get_current_losses()
+
+                #print(f"[Epoch {epoch} | Iter {epoch_iter}] Losses G: {losses[0]:.4f}, D_A: {losses[1]:.4f}, D_B: {losses[2]:.4f}")
+                print(f"[Epoch {epoch} | Iter {epoch_iter}] " + ", ".join([f"{k}: {v:.4f}" for k, v in losses.items()]))
+
+                visualizer.plot_current_losses(epoch, float(epoch_iter) / len(dataset), losses)
+
+                # Affichage avec visualizer
+                visuals = model.get_current_visuals()
+                visualizer.display_current_results(visuals, epoch, save_result=True)
 
         if epoch % opt.save_epoch_freq == 0:
             print(f"[💾] Sauvegarde à l'époque {epoch}")
             model.save_networks(epoch)
 
         print(f"[✅] Fin époque {epoch} | Temps écoulé : {time.time() - epoch_start_time:.2f}s")
-        model.update_learning_rate()
+        #model.update_learning_rate()
 
 if __name__ == '__main__':
     main()

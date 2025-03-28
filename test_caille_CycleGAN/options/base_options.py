@@ -36,6 +36,14 @@ class BaseOptions():
         self.parser.add_argument('--n_layers_D', type=int, default=3, help='nombre de couches pour le discriminateur (PatchGAN)')
         self.parser.add_argument('--lr_policy', type=str, default='linear', help='type de scheduler de lr')
         self.parser.add_argument('--lr_decay_iters', type=int, default=50, help='intervalle de réduction de lr si step')
+        self.parser.add_argument('--display_id', type=int, default=-1, help='window id of the web display')
+        self.parser.add_argument('--display_winsize', type=int, default=256, help='visdom display window size')
+        self.parser.add_argument('--display_port', type=int, default=8097, help='visdom port')
+        self.parser.add_argument('--display_server', type=str, default="http://localhost", help='visdom server')
+        self.parser.add_argument('--display_env', type=str, default='main', help='visdom display environment')
+        self.parser.add_argument('--display_ncols', type=int, default=4, help='number of images per row in visdom')
+        self.parser.add_argument('--no_html', action='store_true', help='do not save intermediate training results to [opt.checkpoints_dir]/web/')
+        self.parser.add_argument('--checkpoints_dir', type=str, default='./checkpoints', help='models are saved here')
 
         self.initialized = True
 

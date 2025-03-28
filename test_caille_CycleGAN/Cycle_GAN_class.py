@@ -5,7 +5,7 @@ from test_caille_CycleGAN.base_model import BaseModel
 from test_caille_CycleGAN import networks
 from torchvision.transforms import Grayscale, ColorJitter
 #from torch.cuda.amp import GradScaler, autocast
-from torch.amp import GradScaler, autocast
+from torch.cuda.amp import GradScaler, autocast
 
 
 class MultiStainCycleGANModel(BaseModel):
@@ -155,6 +155,15 @@ class MultiStainCycleGANModel(BaseModel):
         else:
             self.gray_fake_A = self.to_grayscale(self.fake_A)
         self.rec_B = self.netG_A(self.gray_fake_A)   # G_A(G_B(B))
+
+    def compute_visuals(self):
+        """Calculate additional output images for visdom and HTML visualization."""
+        pass  # Tu peux ajouter du code ici si tu veux faire des traitements particuliers
+
+    def test(self):
+        with torch.no_grad():
+            self.forward()
+            self.compute_visuals()
 
     def backward_D_basic(self, netD, real, fake):
         """Calculate GAN loss for the discriminator

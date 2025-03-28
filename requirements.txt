@@ -5,3 +5,5 @@ h5py
 tqdm
 pandas
 numpy
+dominate
+Pillow
