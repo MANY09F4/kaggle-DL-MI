@@ -58,10 +58,9 @@ class H5UnalignedDataset(Dataset):
         if img_B.ndim == 3 and img_B.shape[-1] == 3:
             img_B = img_B.permute(2, 0, 1)
 
-        #Normalisation [-1, 1] (standard pour les GANs)
-        img_A = (img_A * 255).float() / 127.5 - 1.0
+        img_A = img_A.float() * 2.0 - 1.0
+        img_B = img_B.float() * 2.0 - 1.0
 
-        img_B = (img_B * 255).float() / 127.5 - 1.0
 
 
 
