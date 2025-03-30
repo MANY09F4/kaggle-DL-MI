@@ -20,13 +20,20 @@ def main():
 
     transform = None
 
-    dataset = H5UnalignedDataset(
-        h5_path_A=opt.train_path,
-        h5_path_B=opt.val_path,
-        transform=transform,
-        max_items_A=opt.max_items_A,
-        max_items_B=opt.max_items_B
-    )
+    if opt.test:
+        dataset = H5UnalignedDataset(
+            h5_path_A=[opt.train_path, opt.val_path],
+            h5_path_B=opt.test_path,
+            transform=transform,
+            test=True
+        )
+    else:
+        dataset = H5UnalignedDataset(
+            h5_path_A=opt.train_path,
+            h5_path_B=opt.val_path,
+            transform=transform
+        )
+
 
     # print("\n[DEBUG] Stats par centre et label :")
     # stats_A = count_labels_and_centers(opt.train_path, dataset.keys_A)

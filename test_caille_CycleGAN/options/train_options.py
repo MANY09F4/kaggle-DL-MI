@@ -20,3 +20,5 @@ class TrainOptions(BaseOptions):
         self.parser.add_argument('--max_items_B', type=int, default=None, help='Nombre max d\'images dans val (domaine B)')
         self.parser.add_argument('--train_path', type=str, default='data/train.h5', help='chemin vers train.h5')
         self.parser.add_argument('--val_path', type=str, default='data/val.h5', help='chemin vers val.h5')
+        self.parser.add_argument('--test', action='store_true', help='Activer le mode test (train+val -> test)')
+        self.parser.add_argument('--test_path', type=str, default='', help='Chemin vers test.h5 si --test est activé')
