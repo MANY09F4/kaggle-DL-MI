@@ -11,6 +11,8 @@ class H5UnalignedDataset(Dataset):
         self.h5_path_B = h5_path_B if isinstance(h5_path_B, list) else [h5_path_B]
         self.transform = transform
         self.seed = seed
+        self.is_test = test  # <- à ajouter
+
 
         random.seed(self.seed)
 
@@ -21,24 +23,34 @@ class H5UnalignedDataset(Dataset):
         self.len_B = len(self.keys_B)
         self.length = max(self.len_A, self.len_B)
 
-    def _load_balanced_keys(self, h5_paths, max_items):
-        keys = []
-        for path in h5_paths:
-            with h5py.File(path, 'r') as f:
-                for key in f.keys():
-                    label = int(np.array(f[key]['label']))
-                    keys.append((path, key, label))
+    def _load_balanced_keys(self, h5_path, max_items):
+        with h5py.File(h5_path, 'r') as f:
+            keys = list(f.keys())
 
-        if max_items is None:
-            return keys
+            # Si on est en mode test, on ne filtre pas par label
+            if self.is_test and h5_path == self.h5_path_B:
+                if max_items is not None:
+                    random.shuffle(keys)
+                    return keys[:max_items]
+                return keys
 
-        class_0 = [k for k in keys if k[2] == 0]
-        class_1 = [k for k in keys if k[2] == 1]
-        n_per_class = min(max_items // 2, len(class_0), len(class_1))
+            # Sinon comportement standard (par label)
+            keys_by_label = {0: [], 1: []}
+            for key in keys:
+                label = int(np.array(f[key]['label']))
+                if label in keys_by_label:
+                    keys_by_label[label].append(key)
 
-        selected = random.sample(class_0, n_per_class) + random.sample(class_1, n_per_class)
-        random.shuffle(selected)
-        return selected
+            if max_items is None:
+                return keys_by_label[0] + keys_by_label[1]
+
+            random.shuffle(keys_by_label[0])
+            random.shuffle(keys_by_label[1])
+            n_per_class = min(max_items // 2, len(keys_by_label[0]), len(keys_by_label[1]))
+            selected_keys = keys_by_label[0][:n_per_class] + keys_by_label[1][:n_per_class]
+            random.shuffle(selected_keys)
+            return selected_keys
+
 
     def __getitem__(self, idx):
         index_A = idx % self.len_A
