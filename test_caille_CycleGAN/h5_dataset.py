@@ -11,61 +11,54 @@ class H5UnalignedDataset(Dataset):
         self.h5_path_B = h5_path_B if isinstance(h5_path_B, list) else [h5_path_B]
         self.transform = transform
         self.seed = seed
-        self.is_test = test  # <- à ajouter
-
+        self.is_test = test
 
         random.seed(self.seed)
 
-        self.keys_A = self._load_balanced_keys(self.h5_path_A, max_items_A)
-        self.keys_B = self._load_balanced_keys(self.h5_path_B, max_items_B)
+        self.keys_A = self._load_keys(self.h5_path_A, max_items_A, balance_labels=not self.is_test)
+        self.keys_B = self._load_keys(self.h5_path_B, max_items_B, balance_labels=not self.is_test)
 
         self.len_A = len(self.keys_A)
         self.len_B = len(self.keys_B)
-        self.length = max(self.len_A, self.len_B)
 
-    def _load_balanced_keys(self, h5_paths, max_items):
-        all_keys = []
+    def _load_keys(self, paths, max_items, balance_labels=True):
+        keys = []
 
-        for path in h5_paths:
+        for path in paths:
             with h5py.File(path, 'r') as f:
-                keys = list(f.keys())
+                all_keys = list(f.keys())
 
-                # Si on est en mode test et que ce fichier est dans le domaine B, on ne filtre pas
-                if self.is_test and path in self.h5_path_B:
-                    if max_items is not None:
-                        random.shuffle(keys)
-                        keys = keys[:max_items]
-                    all_keys += [(path, k, None) for k in keys]
-                    continue
+                if balance_labels:
+                    keys_by_label = {0: [], 1: []}
+                    for key in all_keys:
+                        label = int(np.array(f[key]['label']))
+                        if label in keys_by_label:
+                            keys_by_label[label].append(key)
 
-                # Sinon, on utilise les labels pour équilibrer
-                keys_by_label = {0: [], 1: []}
-                for k in keys:
-                    label = int(np.array(f[k]['label']))
-                    if label in keys_by_label:
-                        keys_by_label[label].append(k)
-
-                if max_items is None:
-                    selected = keys_by_label[0] + keys_by_label[1]
+                    if max_items is None:
+                        selected = keys_by_label[0] + keys_by_label[1]
+                    else:
+                        random.shuffle(keys_by_label[0])
+                        random.shuffle(keys_by_label[1])
+                        n = min(max_items // 2, len(keys_by_label[0]), len(keys_by_label[1]))
+                        selected = keys_by_label[0][:n] + keys_by_label[1][:n]
                 else:
-                    random.shuffle(keys_by_label[0])
-                    random.shuffle(keys_by_label[1])
-                    n = min(max_items // 2, len(keys_by_label[0]), len(keys_by_label[1]))
-                    selected = keys_by_label[0][:n] + keys_by_label[1][:n]
+                    selected = all_keys if max_items is None else random.sample(all_keys, min(max_items, len(all_keys)))
 
-                random.shuffle(selected)
-                all_keys += [(path, k, None) for k in selected]
+                keys.extend([(path, k) for k in selected])
 
-        return all_keys
+        random.shuffle(keys)
+        return keys
 
-
+    def __len__(self):
+        return max(len(self.keys_A), len(self.keys_B))
 
     def __getitem__(self, idx):
         index_A = idx % self.len_A
         index_B = idx % self.len_B
 
-        path_A, key_A, _ = self.keys_A[index_A]
-        path_B, key_B, _ = self.keys_B[index_B]
+        path_A, key_A = self.keys_A[index_A]
+        path_B, key_B = self.keys_B[index_B]
 
         with h5py.File(path_A, 'r') as fA, h5py.File(path_B, 'r') as fB:
             img_A = torch.tensor(fA[key_A]['img'][()])
@@ -78,7 +71,6 @@ class H5UnalignedDataset(Dataset):
 
         img_A = img_A.float() * 2.0 - 1.0
         img_B = img_B.float() * 2.0 - 1.0
-
 
         if self.transform:
             img_A = self.transform(img_A)
@@ -93,7 +85,6 @@ class H5UnalignedDataset(Dataset):
 
 
 def count_labels_and_centers(h5_path, selected_keys):
-    """Compte le nombre d'images par centre et par label dans un fichier .h5 donné"""
     stats = {}  # {centre: {label: count}}
 
     with h5py.File(h5_path, 'r') as f:
