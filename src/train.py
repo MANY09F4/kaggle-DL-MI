@@ -52,13 +52,20 @@ def main(args):
                             transforms.ToTensor()
                         ])
 
+
     # ==== Données ====
     if args.preprocess_type == "base":
         from preprocess import preprocess_base
         feature_extractor = torch.hub.load('facebookresearch/dinov2', 'dinov2_vits14').to(device)
         feature_extractor.eval()
         train_loader, val_loader = preprocess_base(type="train",feature_extractor=feature_extractor,preprocessing=preprocessing,device=device,args=args) 
+    elif args.preprocess_type == "macenko":
+        from preprocess import preprocess_macenko
+        feature_extractor = torch.hub.load('facebookresearch/dinov2', 'dinov2_vits14').to(device)
+        feature_extractor.eval()
+        train_loader, val_loader = preprocess_macenko(type="train",feature_extractor=feature_extractor,preprocessing=preprocessing,device=device,args=args,idx_target_macenko=2) 
 
+    
     # ==== Modèle ====
     if args.model == 'base':
         from models import linear_probing
@@ -107,6 +114,7 @@ if __name__ == "__main__":
     parser.add_argument("--preprocess_type", type=str, default='base', help="Preprocessing type")
     parser.add_argument("--train_path", type=str, default='../data/train.h5', help="Data Train Path")
     parser.add_argument("--val_path", type=str, default='../data/val.h5', help="Data Validation Path")
+    parser.add_argument("--test_path", type=str, default='../data/test.h5', help="Data Test Path")
     parser.add_argument("--preprocessing", type=str, default='base', help="type of preprocessing")
     parser.add_argument("--size_train", type=int, default=0)
 
