@@ -14,11 +14,11 @@ def main():
     print(f"[INFO] Options : {opt}")
 
     # Dataset : train = domaine A, val = domaine B
-    transform = Compose([
-        Resize((98, 98))  # ça garde [3, 98, 98]
-        ])
+    # transform = Compose([
+    #     Resize((98, 98))  # ça garde [3, 98, 98]
+    #     ])
 
-    #transform = None
+    transform = None
 
     if opt.test:
         dataset = H5UnalignedDataset(
