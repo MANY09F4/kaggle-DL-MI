@@ -6,6 +6,7 @@ data/
 *.h5
 *.csv
 CailleTest.ipynb
+getting_started.ipynb
 
 # Fichiers de notebooks temporaires
 .ipynb_checkpoints/

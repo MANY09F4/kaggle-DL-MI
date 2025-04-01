@@ -1,4 +1,3 @@
-#from test_caille_CycleGAN.options.base_options import BaseOptions
 from .base_options import BaseOptions
 
 class TrainOptions(BaseOptions):
@@ -20,5 +19,6 @@ class TrainOptions(BaseOptions):
         self.parser.add_argument('--max_items_B', type=int, default=None, help='Nombre max d\'images dans val (domaine B)')
         self.parser.add_argument('--train_path', type=str, default='data/train.h5', help='chemin vers train.h5')
         self.parser.add_argument('--val_path', type=str, default='data/val.h5', help='chemin vers val.h5')
-        self.parser.add_argument('--test', action='store_true', help='Activer le mode test (train+val -> test)')
-        self.parser.add_argument('--test_path', type=str, default='', help='Chemin vers test.h5 si --test est activé')
+        self.parser.add_argument('--test_path', type=str, default='data/test.h5', help='chemin vers test.h5')
+        self.parser.add_argument('--domain', type=int, default=None, help='Domaine source sélectionné')
+        self.parser.add_argument('--aberrant_ids', type=str, default="", help="Liste des IDs aberrants à exclure (séparés par des virgules)")
