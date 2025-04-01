@@ -7,9 +7,16 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 import torchvision.transforms as transforms
+import matplotlib.pyplot as plt 
 
 from models import linear_probing
+import sys
+import os
 
+# Ajouter le dossier "projet" au path
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))  # remonte à "projet"
+sys.path.append(ROOT_DIR)
+from test_caille_CycleGAN.util.util import save_image
 
 def load_model(model_type, checkpoint_path, feature_extractor, device):
     if model_type == 'base':
@@ -50,6 +57,7 @@ def main(args):
     with h5py.File(args.test_path, 'r') as hdf:
         test_ids = list(hdf.keys())
         for test_id in tqdm(test_ids):
+
             img = np.array(hdf[test_id]['img'])
             img_tensor = preprocessing(torch.tensor(img)).unsqueeze(0).float().to(device)
 
@@ -59,6 +67,16 @@ def main(args):
 
             solutions_data['ID'].append(int(test_id))
             solutions_data['Pred'].append(int(pred > 0.5))  
+
+            if test_id == test_ids[2]:
+                img2 = np.array(hdf[test_ids[2]]['img'])
+                if img2.shape[0] == 3:  # (C, H, W)
+                    img2 = np.transpose(img2, (1, 2, 0))
+                    img2 = (img2 * 255).astype(np.uint8) 
+
+                save_image(img2,"checkpoints/pics/image_test_2.png")
+
+
 
     # === Save submission ===
     df = pd.DataFrame(solutions_data).set_index('ID')

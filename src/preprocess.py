@@ -5,6 +5,13 @@ import torch
 from tqdm import tqdm
 import torchstain
 import torchvision.transforms as transforms
+import sys
+import os
+
+# Ajouter le dossier "projet" au path
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))  # remonte à "projet"
+sys.path.append(ROOT_DIR)
+from test_caille_CycleGAN.util.util import save_image
 
 class BaselineDataset(Dataset):
     def __init__(self, dataset_path, preprocessing, mode, stain_normalizer=None, max_samples=None, center_balanced=True):
@@ -49,35 +56,51 @@ class BaselineDataset(Dataset):
             img = np.array(hdf[img_id]["img"])
             label = np.array(hdf[img_id].get("label")) if self.mode == 'train' else None
         
-        #print("1",img.shape,img.max())
+            # #ViZU image before transfo
+            # img2 = np.array(hdf[img_id]["img"])
+            # if img2.shape[0] == 3:  # (C, H, W)
+            #     img2 = np.transpose(img2, (1, 2, 0))
+            # if img2.max() <=1:
+            #     img2 = (img2*255).astype(np.uint8) 
+            # else:
+            #     img2 = (img2).astype(np.uint8) 
 
-        if img.shape[-1]==3:
-            img = torch.tensor(img).permute(2, 0, 1).float()
-        else:
-            img = torch.tensor(img).float()
+            # save_image(img2,"checkpoints/pics/image_before_transfo.png")
 
-        if img.max() <= 1.0:
-            img = img * 255.
         
         try:
             if self.stain_normalizer is not None:
+                if img.shape[-1]==3:
+                    img = torch.tensor(img).permute(2, 0, 1).float() #As we need (C,H,W) for normalizer
+                else:
+                    img = torch.tensor(img).float()
+
+                if img.max() <= 1.0:
+                    img = img * 255. #As we need [0,255] for normalizer
+
                 img, _, _ = self.stain_normalizer.normalize(img, stains=True)
-                img = img.permute(2,1,0)
+                img = img.permute(2,1,0) #Come back to (C,H,W) as normalizer gives (H,W,C)
         except Exception as e:
             print(f"Stain normalization failed on idx={idx} | image shape={img.shape} | max={img.max()}")
-            # Option 1 : retour image non normalisée (fallback)
-            # Option 2 : choisir une image random dans le dataset
-            img = img  # fallback : ne rien faire (on peut aussi remplacer par torch.zeros_like(img))
+            img = img  # We don't do anything if it fails
 
+        # #ViZU after transformation
+        # img2 = np.array(img)
+        # if img2.shape[0] == 3:  # (C, H, W) reshape as save image need (H,W,C)
+        #     img2 = np.transpose(img2, (1, 2, 0))
+        # if img2.max() <=1:
+        #     img2 = (img2*255).astype(np.uint8) 
+        # else:
+        #     img2 = (img2).astype(np.uint8) 
+
+        # save_image(img2,"checkpoints/pics/image_after_transfo.png")
         
-        #print("2",img.shape,img.max())
 
-        img = self.preprocessing(img).float()
+        img = self.preprocessing(torch.tensor(img)).float()
 
         if img.max() > 1.0:
-            img = img / 255.0
+            img = img / 255.0 #Put in [0,1] as we need [0,1] for DiNoV2
 
-        #print("3",img.shape,img.max())
         return img, label
 
 
@@ -141,12 +164,22 @@ def preprocess_macenko(type,feature_extractor,device,preprocessing,idx_target_ma
 
         test_dataset = BaselineDataset(args.test_path, preprocessing=lambda x: x, mode="train")
         target_img, _ = test_dataset[idx_target_macenko]
-        #target_img = target_img.permute((1,2,0))
+
         target_img = transforms.Resize((96, 96))(target_img)
-        #print("test",target_img.shape,target_img.max())
+        target_img = target_img * 255 #Target images are in [0,1] and Macenko need [0,255]
 
         normalizer = torchstain.normalizers.MacenkoNormalizer(backend='torch')
         normalizer.fit(target_img)
+
+        # #ViZU the test IMAGE
+        # img2 = np.array(target_img)
+        # #print(img2.max())
+        # if img2.shape[0] == 3:  # (C, H, W) reshape as save image need (H,W,C)
+        #     img2 = np.transpose(img2, (1, 2, 0))
+        #     img2 = (img2).astype(np.uint8) 
+        #     #print(img2.max())
+
+        #     save_image(img2,"checkpoints/pics/image_test_macenko.png")
 
  
         train_dataset = BaselineDataset(
