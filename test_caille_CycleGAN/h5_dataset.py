@@ -30,8 +30,8 @@ class H5UnalignedDataset(Dataset):
         self.keys_B = self._load_keys_target(self.h5_path_B, max_items_B)
 
         # Filtrer les clés aberrantes si nécessaire
-        self.keys_A = [key for key in self.keys_A if key[1] not in self.aberrant_ids]
-        self.keys_B = [key for key in self.keys_B if key[1] not in self.aberrant_ids]
+        self.keys_A = [key for key in self.keys_A if int(key[1]) not in self.aberrant_ids]
+        self.keys_B = [key for key in self.keys_B if int(key[1]) not in self.aberrant_ids]
 
         self.len_A = len(self.keys_A)
         self.len_B = len(self.keys_B)
