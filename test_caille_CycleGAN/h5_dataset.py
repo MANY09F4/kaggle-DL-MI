@@ -10,6 +10,12 @@ from torch.utils.data import Dataset
 import numpy as np
 import random
 
+import h5py
+import torch
+from torch.utils.data import Dataset
+import numpy as np
+import random
+
 class H5UnalignedDataset(Dataset):
     def __init__(self, h5_path_A, h5_path_B, transform=None, max_items_A=None, max_items_B=None, seed=42, domain=None, aberrant_ids=None):
         super().__init__()
@@ -22,13 +28,16 @@ class H5UnalignedDataset(Dataset):
 
         random.seed(self.seed)
 
-        # Si un domaine est spécifié, on le charge sinon on charge tous les centres
+        # Charger les images pour le domaine source (train, val)
         if self.domain is None:
-            self.keys_A = self._load_keys(self.h5_path_A, max_items_A, balance_labels=True)
+            # Si aucun domaine spécifique n'est sélectionné, charger les données des domaines sources (train et val)
+            self.keys_A = self._load_keys_source(self.h5_path_A, max_items_A, balance_labels=True)
         else:
-            self.keys_A = self._load_keys(self.h5_path_A, max_items_A, balance_labels=True, domain=self.domain)
+            # Si un domaine source est sélectionné, charger uniquement les images de ce domaine
+            self.keys_A = self._load_keys_source(self.h5_path_A, max_items_A, balance_labels=True, domain=self.domain)
 
-        self.keys_B = self._load_keys(self.h5_path_B, max_items_B, balance_labels=True)
+        # Charger les images pour le domaine cible (test)
+        self.keys_B = self._load_keys_target(self.h5_path_B, max_items_B)
 
         # Filtrer les clés aberrantes si nécessaire
         self.keys_A = [key for key in self.keys_A if key[1] not in self.aberrant_ids]
@@ -37,7 +46,7 @@ class H5UnalignedDataset(Dataset):
         self.len_A = len(self.keys_A)
         self.len_B = len(self.keys_B)
 
-    def _load_keys(self, paths, max_items, balance_labels=True, domain=None):
+    def _load_keys_source(self, paths, max_items, balance_labels=True, domain=None):
         keys = []
 
         for path in paths:
@@ -53,7 +62,7 @@ class H5UnalignedDataset(Dataset):
                             keys_by_center[key] = f[key]
                     selected = list(keys_by_center.keys())
                 else:
-                    # Sinon, on fait comme avant, on charge tous les centres
+                    # Sinon, on charge tous les centres
                     if balance_labels:
                         keys_by_label = {0: [], 1: []}
                         for key in all_keys:
@@ -74,6 +83,21 @@ class H5UnalignedDataset(Dataset):
                             selected = keys_by_label[0][:n] + keys_by_label[1][:n]
                     else:
                         selected = all_keys if max_items is None else random.sample(all_keys, min(max_items, len(all_keys)))
+
+                keys.extend([(path, k) for k in selected])
+
+        random.shuffle(keys)
+        return keys
+
+    def _load_keys_target(self, paths, max_items):
+        keys = []
+
+        for path in paths:
+            with h5py.File(path, 'r') as f:
+                all_keys = list(f.keys())
+
+                # Pour le domaine cible, on ne s'intéresse pas aux labels
+                selected = all_keys if max_items is None else random.sample(all_keys, min(max_items, len(all_keys)))
 
                 keys.extend([(path, k) for k in selected])
 
