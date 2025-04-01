@@ -57,9 +57,13 @@ class H5UnalignedDataset(Dataset):
                     if balance_labels:
                         keys_by_label = {0: [], 1: []}
                         for key in all_keys:
-                            label = int(np.array(f[key]['label']))
-                            if label in keys_by_label:
-                                keys_by_label[label].append(key)
+                            try:
+                                label = int(np.array(f[key]['label']))
+                                if label in keys_by_label:
+                                    keys_by_label[label].append(key)
+                            except KeyError:
+                                # Si la clé 'label' n'existe pas (pour test), ignorer cette image
+                                pass
 
                         if max_items is None:
                             selected = keys_by_label[0] + keys_by_label[1]
