@@ -77,6 +77,7 @@ class H5UnalignedDataset(Dataset):
         return keys
 
     def __len__(self):
+        print(f"Nb d'images domaine source : {len(self.keys_A)}")
         return max(len(self.keys_A), len(self.keys_B))
 
     def __getitem__(self, idx):
