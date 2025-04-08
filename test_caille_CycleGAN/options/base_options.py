@@ -32,7 +32,7 @@ class BaseOptions():
         self.parser.add_argument('--gan_mode', type=str, default='lsgan', help='type de GAN loss : lsgan | vanilla | wgangp')
         self.parser.add_argument('--pool_size', type=int, default=50, help='taille du buffer d\'images générées')
         self.parser.add_argument('--D_thresh', action='store_true', help='active un seuil pour la mise à jour de D')
-        self.parser.add_argument('--D_thresh_value', type=float, default=0.5)
+        self.parser.add_argument('--D_thresh_value', type=float, default=0.1)
         self.parser.add_argument('--n_layers_D', type=int, default=3, help='nombre de couches pour le discriminateur (PatchGAN)')
         self.parser.add_argument('--lr_policy', type=str, default='linear', help='type de scheduler de lr')
         self.parser.add_argument('--lr_decay_iters', type=int, default=50, help='intervalle de réduction de lr si step')
