@@ -8,7 +8,9 @@ MedImg_4_GANs/
 Results_dino_finetune_Multi_GAN_full/
 Results_dino_finetune_Multi_GAN_split/
 Domain_0/
+Domain_1/
 DOmain_3/
+DOmain_4/
 All_domains/
 *.h5
 *.csv
