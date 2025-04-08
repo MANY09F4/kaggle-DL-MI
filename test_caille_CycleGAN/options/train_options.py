@@ -22,3 +22,5 @@ class TrainOptions(BaseOptions):
         self.parser.add_argument('--test_path', type=str, default='data/test.h5', help='chemin vers test.h5')
         self.parser.add_argument('--domain', type=int, default=None, help='Domaine source sélectionné')
         self.parser.add_argument('--aberrant_ids', type=str, default="", help="Liste des IDs aberrants à exclure (séparés par des virgules)")
+        self.parser.add_argument('--aberrant_ids_train', type=str, default="", help="Liste des IDs aberrants train à exclure (séparés par des virgules)")
+        self.parser.add_argument('--aberrant_ids_val', type=str, default="", help="Liste des IDs aberrants val à exclure (séparés par des virgules)")

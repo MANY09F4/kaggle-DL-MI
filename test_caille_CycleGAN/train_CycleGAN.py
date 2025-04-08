@@ -15,8 +15,12 @@ def main():
 
     transform = None  # Pas de transformation si tu ne veux pas la modifier.
 
+    aberrant_ids_map = {
+    opt.train_path: [int(i) for i in opt.aberrant_ids_train.split(",")],
+    opt.val_path: [int(i) for i in opt.aberrant_ids_val.split(",")]
+        }
     # Convertir aberrant_ids en liste
-    aberrant_ids = [int(id) for id in opt.aberrant_ids.split(',')] if opt.aberrant_ids else []
+    #aberrant_ids = [int(id) for id in opt.aberrant_ids.split(',')] if opt.aberrant_ids else []
 
     # Si domain est spécifié, charger seulement le domaine source sélectionné.
     if opt.domain is None:
@@ -25,7 +29,7 @@ def main():
             h5_path_A=[opt.train_path, opt.val_path],
             h5_path_B=opt.test_path,
             transform=transform,
-            aberrant_ids=aberrant_ids
+            aberrant_ids_map=aberrant_ids_map
         )
     else:
         # Si un domaine source est sélectionné, on charge seulement ce domaine source
@@ -34,7 +38,7 @@ def main():
             h5_path_B=opt.test_path,
             domain=opt.domain,  # Passe le domaine sélectionné
             transform=transform,
-            aberrant_ids=aberrant_ids
+            aberrant_ids_map=aberrant_ids_map
         )
 
     dataloader = DataLoader(dataset, batch_size=opt.batch_size, shuffle=True)
