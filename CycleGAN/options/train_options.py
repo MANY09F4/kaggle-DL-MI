@@ -1,26 +1,45 @@
 from .base_options import BaseOptions
 
 class TrainOptions(BaseOptions):
+    """
+    This class includes training-specific options.
+    It also includes shared options defined in BaseOptions.
+    """
+
     def initialize(self):
         super().initialize()
-        self.parser.add_argument('--epoch_count', type=int, default=1, help='première époque')
-        self.parser.add_argument('--n_epochs', type=int, default=100, help='nombre d\'époques avec lr constant')
-        self.parser.add_argument('--n_epochs_decay', type=int, default=0, help='nombre d\'époques avec décroissance de lr')
-        self.parser.add_argument('--lr_G', type=float, default=0.0002, help='learning rate pour le générateur')
-        self.parser.add_argument('--lr_D', type=float, default=0.0002, help='learning rate pour le discriminateur')
-        self.parser.add_argument('--beta1', type=float, default=0.5, help='momentum pour Adam')
-        self.parser.add_argument('--netD_opt', type=str, default='adam', help='optimizer pour D : adam | sgd')
-        self.parser.add_argument('--print_freq', type=int, default=100, help='fréquence d\'affichage des pertes')
-        self.parser.add_argument('--save_epoch_freq', type=int, default=10, help='fréquence de sauvegarde des modèles (en époques)')
-        self.parser.add_argument('--lambda_A', type=float, default=10.0, help='poids cycle loss A')
-        self.parser.add_argument('--lambda_B', type=float, default=10.0, help='poids cycle loss B')
-        self.parser.add_argument('--lambda_identity', type=float, default=0.5, help='poids identity loss')
-        self.parser.add_argument('--max_items_A', type=int, default=None, help='Nombre max d\'images dans train (domaine A)')
-        self.parser.add_argument('--max_items_B', type=int, default=None, help='Nombre max d\'images dans val (domaine B)')
-        self.parser.add_argument('--train_path', type=str, default='data/train.h5', help='chemin vers train.h5')
-        self.parser.add_argument('--val_path', type=str, default='data/val.h5', help='chemin vers val.h5')
-        self.parser.add_argument('--test_path', type=str, default='data/test.h5', help='chemin vers test.h5')
-        self.parser.add_argument('--domain', type=int, default=None, help='Domaine source sélectionné')
-        self.parser.add_argument('--aberrant_ids', type=str, default="", help="Liste des IDs aberrants à exclure (séparés par des virgules)")
-        self.parser.add_argument('--aberrant_ids_train', type=str, default="", help="Liste des IDs aberrants train à exclure (séparés par des virgules)")
-        self.parser.add_argument('--aberrant_ids_val', type=str, default="", help="Liste des IDs aberrants val à exclure (séparés par des virgules)")
+
+        # Training epochs and learning rate scheduling
+        self.parser.add_argument('--epoch_count', type=int, default=1, help='Starting epoch count')
+        self.parser.add_argument('--n_epochs', type=int, default=100, help='Number of epochs with initial learning rate')
+        self.parser.add_argument('--n_epochs_decay', type=int, default=0, help='Number of epochs to linearly decay learning rate to zero')
+
+        # Learning rates
+        self.parser.add_argument('--lr_G', type=float, default=0.0002, help='Initial learning rate for the generator')
+        self.parser.add_argument('--lr_D', type=float, default=0.0002, help='Initial learning rate for the discriminator')
+        self.parser.add_argument('--beta1', type=float, default=0.5, help='Momentum term for Adam optimizer')
+        self.parser.add_argument('--netD_opt', type=str, default='adam', help='Optimizer for discriminator: adam | sgd')
+
+        # Logging and saving
+        self.parser.add_argument('--print_freq', type=int, default=100, help='Frequency of showing training losses')
+        self.parser.add_argument('--save_epoch_freq', type=int, default=10, help='Frequency of saving checkpoints (in epochs)')
+
+        # Loss weighting
+        self.parser.add_argument('--lambda_A', type=float, default=10.0, help='Weight for forward cycle loss (A -> B -> A)')
+        self.parser.add_argument('--lambda_B', type=float, default=10.0, help='Weight for backward cycle loss (B -> A -> B)')
+        self.parser.add_argument('--lambda_identity', type=float, default=0.5, help='Weight for identity loss')
+
+        # Dataset options
+        self.parser.add_argument('--max_items_A', type=int, default=None, help='Maximum number of samples to load from source domain (A)')
+        self.parser.add_argument('--max_items_B', type=int, default=None, help='Maximum number of samples to load from target domain (B)')
+        self.parser.add_argument('--train_path', type=str, default='data/train.h5', help='Path to training HDF5 file')
+        self.parser.add_argument('--val_path', type=str, default='data/val.h5', help='Path to validation HDF5 file')
+        self.parser.add_argument('--test_path', type=str, default='data/test.h5', help='Path to test HDF5 file')
+
+        # Domain filtering
+        self.parser.add_argument('--domain', type=int, default=None, help='Filter to use only images from this source domain (center index)')
+
+        # Filtering aberrant images
+        self.parser.add_argument('--aberrant_ids', type=str, default="", help='Comma-separated list of aberrant image IDs to exclude (unused)')
+        self.parser.add_argument('--aberrant_ids_train', type=str, default="", help='Comma-separated list of aberrant train image IDs')
+        self.parser.add_argument('--aberrant_ids_val', type=str, default="", help='Comma-separated list of aberrant val image IDs')
