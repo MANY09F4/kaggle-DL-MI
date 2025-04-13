@@ -11,7 +11,7 @@ import os
 # Ajouter le dossier "projet" au path
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))  # remonte à "projet"
 sys.path.append(ROOT_DIR)
-from test_caille_CycleGAN.util.util import save_image
+from CycleGAN.util.util import save_image
 
 class BaselineDataset(Dataset):
     def __init__(self, dataset_path, preprocessing, mode, stain_normalizer=None, max_samples=None, center_balanced=True):
