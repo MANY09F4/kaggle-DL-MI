@@ -25,6 +25,7 @@ We combine **foundation models** for image embedding with both **learning-based*
 - `Notebooks/`: Colab notebooks to run the training, embedding extraction, and submission on GPU.
 - `requirements.txt`: Python package dependencies.
 - `.gitignore`: ignored files and folders for version control.
+- `report.pdf`: final technical report explaining the methodology, experiments, and results.
 
 ## Acknowledgements
 
